@@ -1,16 +1,17 @@
 import React, { useState } from "react";
 import { Box, Paper, Input, Button, Typography, Stack, IconButton, CircularProgress } from "@mui/material";
 import { Close as CloseIcon, Image as ImageIcon } from "@mui/icons-material";
-import { createCity } from "../../axios/apis";
+import { createLocation } from "../../axios/apis";
 import Loading from "../loading/Loading";
 
-const CreateCityModal = ({ open, handleClose, getAllCities }) => {
+const CreateLocation = ({ open, handleClose }) => {
   if (!open) return null;
 
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [name, setName] = useState("");
-  const [text, setText] = useState('')
+  const [slug, setSlug] = useState("");
+  const [text, setText] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -20,9 +21,9 @@ const CreateCityModal = ({ open, handleClose, getAllCities }) => {
     setImagePreview(URL.createObjectURL(file));
   };
 
-  const handleCreateCity = async () => {
-    if (!name || !image || !text) {
-      setErrorMessage("Iltimos, nom kiriting va rasm yuklang!");
+  const handleCreateLocation = async () => {
+    if (!name || !slug || !text || !image) {
+      setErrorMessage("Iltimos, barcha maydonlarni to‘ldiring!");
       return;
     }
     setErrorMessage("");
@@ -31,11 +32,11 @@ const CreateCityModal = ({ open, handleClose, getAllCities }) => {
     try {
       const formData = new FormData();
       formData.append("name", name);
-      formData.append("images", image);
+      formData.append("slug", slug);
       formData.append("text", text);
+      formData.append("images", image);
       
-      await createCity(formData);
-      getAllCities()
+      await createLocation(formData);
       handleClose(!open);
     } catch (error) {
       setErrorMessage("Xatolik yuz berdi. Iltimos, qayta urinib ko‘ring!");
@@ -49,7 +50,7 @@ const CreateCityModal = ({ open, handleClose, getAllCities }) => {
          justifyContent="center" bgcolor="rgba(0, 0, 0, 0.6)" zIndex={10}>
       <Paper sx={{ bgcolor: "#212121", color: "#fff", borderRadius: 2, p: 3, width: "90%", maxWidth: "500px" }}>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-          <Typography variant="h6" sx={{ fontWeight: "bold", color: "#D32F2F" }}>Yangi Shahar</Typography>
+          <Typography variant="h6" sx={{ fontWeight: "bold", color: "#D32F2F" }}>Yangi Joylashuv</Typography>
           <IconButton onClick={() => handleClose(!open)} sx={{ color: "#fff" }}><CloseIcon /></IconButton>
         </Box>
 
@@ -76,20 +77,27 @@ const CreateCityModal = ({ open, handleClose, getAllCities }) => {
             <Typography sx={{ fontWeight: "bold", mb: 1 }}>Nomi</Typography>
             <Input disableUnderline sx={{ height: "48px", width: "100%", backgroundColor: "#f5f5f5", 
                    borderRadius: 1, p: 1 }} value={name} onChange={(e) => setName(e.target.value)} 
-                   placeholder="Shahar nomini kiriting" />
+                   placeholder="Joylashuv nomini kiriting" />
           </Box>
 
           <Box>
-            <Typography sx={{ fontWeight: "bold", mb: 1 }}>Shahar haqida</Typography>
+            <Typography sx={{ fontWeight: "bold", mb: 1 }}>Slug</Typography>
+            <Input disableUnderline sx={{ height: "48px", width: "100%", backgroundColor: "#f5f5f5", 
+                   borderRadius: 1, p: 1 }} value={slug} onChange={(e) => setSlug(e.target.value)} 
+                   placeholder="Slug kiriting" />
+          </Box>
+
+          <Box>
+            <Typography sx={{ fontWeight: "bold", mb: 1 }}>Tavsif</Typography>
             <Input disableUnderline sx={{ height: "48px", width: "100%", backgroundColor: "#f5f5f5", 
                    borderRadius: 1, p: 1 }} value={text} onChange={(e) => setText(e.target.value)} 
-                   placeholder="Shahar haqida" />
+                   placeholder="Tavsif kiriting" />
           </Box>
 
           <Box display="flex" justifyContent={loading ? 'center': "flex-end"}>
             <Button sx={{ bgcolor: loading ? 'transparent' : "#D32F2F", color: "#FFFFFF", borderRadius: 1, 
                           padding: "10px 20px", 
-                    "&:hover": { bgcolor:loading ? 'transparent' : "#B71C1C" } }} onClick={handleCreateCity} disabled={loading}>
+                    "&:hover": { bgcolor:loading ? 'transparent' : "#B71C1C" } }} onClick={handleCreateLocation} disabled={loading}>
               {loading ? <Loading/> : "Yaratish"}
             </Button>
           </Box>
@@ -99,4 +107,4 @@ const CreateCityModal = ({ open, handleClose, getAllCities }) => {
   );
 };
 
-export default CreateCityModal;
+export default CreateLocation;

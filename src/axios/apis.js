@@ -143,21 +143,87 @@ export const updateCity = async (formData, id) => {
 
 //......................................................................
 
+//location requests
+
 export const createLocation = async (formData) => {
-  const response = axios.post("https://realauto.limsa.uz/api/locations", formData, {
+  const {data} = api.post("/locations", formData, {
     headers: { "Content-Type": "multipart/form-data" },})
 
-    return response
+    return data
 
 }
 
+export const getLocations = async() => {
+  try {
+    const {data} = await api.get('/locations')
+    return data  
+  } catch (error) {
+    return Promise.reject(error.response?.data || error.message);  
+  }
+}
+
+export const deleteLocation = async (id) => {
+   await api.delete(`/locations/${id}`)
+}
+
+export const updateLocation = async (id, formData) => {
+  try {
+    const {data} = await api.put(`/locations/${id}`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return data;
+  } catch (error) {
+    return Promise.reject(error.data || error.message);
+  }
+}
+
+
+//........................................................................
+
+
+//.....cars requests
 export const createCars = async (formData) => {
-  const response = axios.post("https://realauto.limsa.uz/api/cars", formData, {
-    headers: { "Content-Type": "multipart/form-data" },})
+  try {
+    const response = await api.post("/cars", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(error.response?.data || error.message);
+    return Promise.reject(error.response?.data || error.message);
+  }
+};
 
-    return response
-
+export const getCars = async() => {
+  try {
+    const {data} = await api.get('/cars')
+    return data  
+  } catch (error) {
+    return Promise.reject(error.response?.data || error.message);  
+  }
 }
+
+export const deleteCar = async (id) => {
+  try {
+    const {data} = await api.delete(`/cars/${id}`)
+    return data
+    
+  } catch (error) {
+    return Promise.reject(error.response?.data || error.message);
+  }
+}
+
+export const updateCar = async (formData, id) => {
+  try {
+    const response = await api.put(`/cars/${id}`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(error.response?.data || error.message);
+    return Promise.reject(error.response?.data || error.message);
+  }
+};
 
 
 //get requests

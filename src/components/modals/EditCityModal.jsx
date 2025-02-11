@@ -4,7 +4,7 @@ import { Close as CloseIcon, Image as ImageIcon } from "@mui/icons-material";
 import { updateCity } from "../../axios/apis";
 import Loading from "../loading/Loading";
 
-const EditCityModal = ({ city, setEditCityModal }) => {
+const EditCityModal = ({ city, setEditCityModal, getAllCities }) => {
     const [image, setImage] = useState(null);
     const [imagePreview, setImagePreview] = useState(city?.image_src ? `https://realauto.limsa.uz/api/uploads/images/${city.image_src}` : null);
     const [name, setName] = useState(city?.name || "");
@@ -33,6 +33,7 @@ const EditCityModal = ({ city, setEditCityModal }) => {
             formData.append("text", text);
 
             await updateCity(formData, city?.id);
+            getAllCities()
             setEditCityModal(false);
         } catch (error) {
             console.error("Xatolik:", error);

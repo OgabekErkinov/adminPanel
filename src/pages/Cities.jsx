@@ -13,6 +13,7 @@ const Cities = () => {
   const [createModal, setCreateModal] = useState(false);
   const [editModal, setEditModal] = useState(false);
   const [updatedCity, setUpdatedCity] = useState(null);
+  const [errorMessage, setErrorMessage] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -24,7 +25,7 @@ const Cities = () => {
       const { data } = await getCities();
       setCities(data);
     } catch (error) {
-      console.error("Error fetching cities:", error);
+      setErrorMessage(error)
     }
     setIsLoading(false);
   };
@@ -115,8 +116,12 @@ const Cities = () => {
         </TableContainer>
       )}
 
-      {createModal && <CreateCityModal  handleClose={() => setCreateModal(false)} open={createModal} />}
-      {editModal && <EditCityModal city={updatedCity} setEditCityModal={setEditModal}/>}
+      {errorMessage && <Typography sx={{ color: "#D32F2F", fontWeight: "bold", textAlign: "center", mb: 2 }}>
+                                  {errorMessage}
+                        </Typography>}
+
+      {createModal && <CreateCityModal  handleClose={() => setCreateModal(false)} open={createModal} getAllCities={getAllCities}/>}
+      {editModal && <EditCityModal city={updatedCity} setEditCityModal={setEditModal} getAllCities={getAllCities}/>}
     </Box>
   );
 };
