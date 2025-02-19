@@ -1,4 +1,4 @@
-import { Route, Routes, useNavigate } from "react-router"
+import { Route, Routes } from "react-router"
 import Login from "./pages/Login"
 import Home from "./pages/Home"
 import Categories from "./pages/Categories"
@@ -11,7 +11,6 @@ import Cars from "./pages/Cars"
 import Account from "./pages/Account"
 
 function App() {
-  const navigate = useNavigate()
 
   return (
     <Routes>
@@ -24,7 +23,7 @@ function App() {
              <Route path='locations' element = {<Locations/>}/>
              <Route path='cities' element = {<Cities/>}/>
              <Route path='cars' element = {<Cars/>}/>
-             <Route path='/account' element = {<Account/>}/>
+             <Route path='account' element = {<Account/>}/>
        </Route>
     </Routes>
   )

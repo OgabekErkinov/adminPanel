@@ -4,7 +4,7 @@ import { Close as CloseIcon, Image as ImageIcon } from "@mui/icons-material";
 import { updateBrand } from "../../axios/apis";
 import Loading from "../loading/Loading";
 
-const EditBrand = ({ brand, setEditBrandModal }) => {
+const EditBrand = ({ brand, setEditBrandModal, getAllBrands }) => {
     const [image, setImage] = useState(null);
     const [imagePreview, setImagePreview] = useState(brand?.image_src ? `https://realauto.limsa.uz/api/uploads/images/${brand.image_src}` : null);
     const [title, setTitle] = useState(brand?.title || "");
@@ -31,6 +31,7 @@ const EditBrand = ({ brand, setEditBrandModal }) => {
             formData.append("title", title);
 
             await updateBrand(formData, brand?.id);
+            getAllBrands()
             setEditBrandModal(false);
         } catch (error) {
             console.error("Xatolik:", error);

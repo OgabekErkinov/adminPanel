@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Box, Input, Stack, Button, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
+import { Box, Input, Stack, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
 import { deleteCar, getCars } from "../axios/apis";
-import { Visibility, Edit, Delete } from "@mui/icons-material";
+import { Edit, Delete } from "@mui/icons-material";
 import Loading from "../components/loading/Loading";
 import CreateCarModal from "../components/modals/CreateCarModal";
 import EditCarModal from "../components/modals/EditCarModal";
@@ -13,6 +13,8 @@ const Cars = () => {
   const [openCreateModal, setOpenCreateModal] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
   const [selectedCar, setSelectedCar] = useState(null);
+  const [isFocused, setIsFocused] = useState(false);
+  console.log(localStorage.getItem('token'))
 
   const filteredCars = cars.filter((car) =>
     car?.brand.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -46,27 +48,20 @@ const Cars = () => {
   }, []);
 
   return (
-    <Box
-      height="100vh" width="100vw" display="flex" p={2}
-      flexDirection="column" alignItems="center" justifyContent="flex-start"
-      sx={{ background: "linear-gradient(135deg, #000, #6D6D6D)" }}
-    >
-      <Stack direction="row" justifyContent="space-between" alignItems="center" width="100%" maxWidth="900px" mb={2}>
-        <Input
-          disableUnderline
+    <Box height="100%" width="100%" display="flex" p={1} flexDirection="column" 
+         alignItems="center" justifyContent="flex-start" bgcolor='transparent'>
+      <Stack direction="row" justifyContent="flex-end" alignItems="center" width="100%" mb={1}>
+        <Input disableUnderline
           placeholder="Search cars by brand, model, or city..."
           onChange={(e) => setSearchTerm(e.target.value)}
-          sx={{
-            width: '100%', padding: '10px', borderRadius: '8px',
-            backgroundColor: '#ffffff', boxShadow: '0 0 10px rgba(255, 0, 0, 0.4)',
-            fontWeight: 'bold', mr: 2,
-          }}
-        />
-        <Button
-          sx={{ bgcolor: 'green', color: '#FFFFFF', fontWeight: 'bold', height: '40px', width: '12rem' }}
-          onClick={() => setOpenCreateModal(true)}  // Open Create Modal
-        >
-          Create Car
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          sx={{ width: isFocused ? '24rem' : '10rem', transition: 'width 0.3s ease-in-out',
+            padding: '10px', borderRadius: '8px', backgroundColor: '#ffffff',
+            boxShadow: '0 0 10px rgba(255, 0, 0, 0.4)', fontWeight: 'bold', mr: 2 }} />
+        <Button sx={{ bgcolor: 'green', color: '#FFFFFF', fontWeight: 'bold', height: '52px', width: '12rem' }}
+                onClick={() => setOpenCreateModal(true)}>
+           Create
         </Button>
       </Stack>
 
@@ -77,19 +72,14 @@ const Cars = () => {
       ) : (
         <TableContainer
           component={Paper}
-          sx={{
-            width: '100%',
-            maxWidth: '100vw',
-            borderRadius: '8px',
-            overflowX: 'auto',
-            boxSizing: 'border-box',
-            border: '1px solid #ddd',
-            boxShadow: '0px 4px 12px rgba(0,0,0,0.1)',
-          }}
-        >
+          sx={{ backgroundColor: '#ffffff', maxHeight : '80vh', height : '100%', width: '100%', borderRadius: '8px', 
+                 boxShadow: '0px 4px 12px rgba(0,0,0,0.1)', overflowY: 'auto',
+            '&::-webkit-scrollbar': { width: '6px' },
+            '&::-webkit-scrollbar-thumb': { backgroundColor: '#888', borderRadius: '10px' },
+            '&::-webkit-scrollbar-thumb:hover': { backgroundColor: '#555' }, }}>
           <Table sx={{ minWidth: 400 }}>
-            <TableHead>
-              <TableRow sx={{ background: '#D32F2F' }}>
+            <TableHead sx={{position:'sticky', top : '0', zIndex:'2'}}>
+                <TableRow sx={{ background: 'rgba(71, 17, 24, 0.98)' }}>
                 <TableCell sx={{ color: '#fff', fontWeight: 'bold' }}>№</TableCell>
                 <TableCell align="center" sx={{ color: '#fff', fontWeight: 'bold' }}>Image</TableCell>
                 <TableCell align="center" sx={{ color: '#fff', fontWeight: 'bold' }}>Brand</TableCell>
@@ -137,10 +127,7 @@ const Cars = () => {
         </TableContainer>
       )}
 
-      {/* Create Car Modal */}
       <CreateCarModal open={openCreateModal} handleClose={() => setOpenCreateModal(false)} />
-
-      {/* Edit Car Modal */}
       <EditCarModal open={openEditModal} handleClose={() => setOpenEditModal(false)} car={selectedCar} />
     </Box>
   );

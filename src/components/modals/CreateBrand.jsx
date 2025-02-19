@@ -4,7 +4,7 @@ import { Close as CloseIcon, Image as ImageIcon } from "@mui/icons-material";
 import { createBrand } from "../../axios/apis";
 import Loading from "../loading/Loading";
 
-const CreateBrand = ({ open, handleClose }) => {
+const CreateBrand = ({ open, handleClose, getAllBrands }) => {
   if (!open) return null;
 
   const [image, setImage] = useState(null);
@@ -33,6 +33,7 @@ const CreateBrand = ({ open, handleClose }) => {
       formData.append("images", image);
       
       await createBrand(formData);
+      getAllBrands()
       handleClose(!open);
     } catch (error) {
       setErrorMessage("Xatolik yuz berdi. Iltimos, qayta urinib ko‘ring!");

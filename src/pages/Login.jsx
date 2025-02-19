@@ -22,6 +22,7 @@ const Login = () => {
       formDataToSend.append("password", password);
       
       const data = await loginApi(formDataToSend);
+      localStorage.setItem('phone_number' , phone)
       setIsLoading(false);
       setSeverity("success");
       setMessage("Tizimga kirish muvaffaqiyatli");

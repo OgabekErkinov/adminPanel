@@ -1,22 +1,31 @@
 import React, { useState, useEffect } from "react";
-import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, Button } from "@mui/material";
+import { Box, Paper, Select, MenuItem, Button, Typography, Stack, IconButton, Modal, Input } from "@mui/material";
+import { Close as CloseIcon } from "@mui/icons-material";
+import { getBrands, getModels, getCities, getCategories, getLocations, updateCar } from "../../axios/apis";
 
 const EditCarModal = ({ open, handleClose, car }) => {
-  const [carDetails, setCarDetails] = useState({
-    brand: "",
-    model: "",
-    city: "",
-    price: "",
-  });
+  const [brands, setBrands] = useState([]);
+  const [models, setModels] = useState([]);
+  const [cities, setCities] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [locations, setLocations] = useState([]);
+
+  const [carDetails, setCarDetails] = useState({});
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setBrands((await getBrands())?.data || []);
+      setModels((await getModels())?.data || []);
+      setCities((await getCities())?.data || []);
+      setCategories((await getCategories())?.data || []);
+      setLocations((await getLocations())?.data || []);
+    };
+    fetchData();
+  }, []);
 
   useEffect(() => {
     if (car) {
-      setCarDetails({
-        brand: car.brand.title,
-        model: car.model.name,
-        city: car.city.name,
-        price: car.price_in_usd,
-      });
+      setCarDetails({ ...car });
     }
   }, [car]);
 
@@ -25,59 +34,51 @@ const EditCarModal = ({ open, handleClose, car }) => {
     setCarDetails({ ...carDetails, [name]: value });
   };
 
-  const handleEdit = () => {
-    // Car edit logic
-    console.log(carDetails);
-    handleClose();  // Close the modal after editing
+  const handleEdit = async () => {
+    await updateCar(car.id, carDetails);
+    handleClose();
   };
 
   return (
-    <Dialog open={open} onClose={handleClose}>
-      <DialogTitle>Edit Car</DialogTitle>
-      <DialogContent>
-        <TextField
-          name="brand"
-          label="Brand"
-          fullWidth
-          value={carDetails.brand}
-          onChange={handleChange}
-          sx={{ mb: 2 }}
-        />
-        <TextField
-          name="model"
-          label="Model"
-          fullWidth
-          value={carDetails.model}
-          onChange={handleChange}
-          sx={{ mb: 2 }}
-        />
-        <TextField
-          name="city"
-          label="City"
-          fullWidth
-          value={carDetails.city}
-          onChange={handleChange}
-          sx={{ mb: 2 }}
-        />
-        <TextField
-          name="price"
-          label="Price (USD)"
-          type="number"
-          fullWidth
-          value={carDetails.price}
-          onChange={handleChange}
-          sx={{ mb: 2 }}
-        />
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleClose} color="secondary">
-          Cancel
-        </Button>
-        <Button onClick={handleEdit} color="primary">
-          Save Changes
-        </Button>
-      </DialogActions>
-    </Dialog>
+    <Modal open={open} onClose={handleClose} sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <Box bgcolor="#424242" p={3} borderRadius={2} boxShadow={24} width={{ xs: "90vw", sm: "60vw", md: "50vw" }}>
+        <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
+          <Typography variant="h6" sx={{ fontWeight: "bold", color: "#F44336" }}>Edit Car</Typography>
+          <IconButton onClick={handleClose} sx={{ color: "#fff" }}>
+            <CloseIcon />
+          </IconButton>
+        </Stack>
+
+        <Stack spacing={2}>
+          {Object.keys(carDetails).map((key) => (
+            <Box key={key}>
+              <Typography sx={{ fontWeight: "bold", mb: 1 }}>{key.replace(/_/g, " ")}</Typography>
+              {key.includes("id") || key === "drive_side" ? (
+                <Select fullWidth name={key} value={carDetails[key] || ""} onChange={handleChange} displayEmpty sx={{ backgroundColor: "#f5f5f5", borderRadius: 1 }}>
+                  {key === "brand_id" && brands.map((item) => <MenuItem key={item.id} value={item.id}>{item.title}</MenuItem>)}
+                  {key === "model_id" && models.map((item) => <MenuItem key={item.id} value={item.id}>{item.name}</MenuItem>)}
+                  {key === "city_id" && cities.map((item) => <MenuItem key={item.id} value={item.id}>{item.name}</MenuItem>)}
+                  {key === "category_id" && categories.map((item) => <MenuItem key={item.id} value={item.id}>{item.title}</MenuItem>)}
+                  {key === "location_id" && locations.map((item) => <MenuItem key={item.id} value={item.id}>{item.name}</MenuItem>)}
+                  {key === "drive_side" && (
+                    <>
+                      <MenuItem value="right">Right</MenuItem>
+                      <MenuItem value="left">Left</MenuItem>
+                    </>
+                  )}
+                </Select>
+              ) : (
+                <Input disableUnderline sx={{ height: "48px", width: "100%", backgroundColor: "#f5f5f5", borderRadius: 1, p: 1 }} value={carDetails[key] || ""} onChange={handleChange} name={key} placeholder={`Enter ${key.replace(/_/g, " ")}`} type={key.includes("price") || key === "year" || key.includes("max") || key === "seconds" ? "number" : "text"} />
+              )}
+            </Box>
+          ))}
+        </Stack>
+
+        <Stack direction="row" justifyContent="center" mt={2}>
+          <Button onClick={handleEdit} sx={{ bgcolor: "green", color: "#FFFFFF", fontWeight: "bold", ml: 2 }}>Save</Button>
+        </Stack>
+      </Box>
+    </Modal>
   );
 };
 

@@ -226,7 +226,51 @@ export const updateCar = async (formData, id) => {
 };
 
 
-//get requests
+//model requests
+
+export const createModel = async (formData) => {
+  try {
+    const {data} = await api.post("/models", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return data;
+  } catch (error) {
+    console.error(error.data || error.message);
+    return Promise.reject(error.data || error.message);
+  }
+};
+
+export const getModels = async() => {
+  try {
+    const {data} = await api.get('/models')
+    return data  
+  } catch (error) {
+    return Promise.reject(error.data || error.message);  
+  }
+}
+
+export const deleteModel = async (id) => {
+  try {
+    const { data } = await api.delete(`/models/${id}`);
+    return data;
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || "Serverdan xatolik!";
+    return Promise.reject(errorMessage);
+  }
+};
+
+
+export const updateModel = async (formData, id) => {
+  try {
+    const {data} = await api.put(`/models/${id}`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return data;
+  } catch (error) {
+    console.error(error.data || error.message);
+    return Promise.reject(error.data || error.message);
+  }
+};
 
 
 

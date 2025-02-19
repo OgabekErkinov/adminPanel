@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Input, Stack, Button, Typography } from '@mui/material';
-
+import { Box, Input, Stack, Button } from '@mui/material';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -21,6 +20,7 @@ const Locations = () => {
   const [editModal, setEditModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
 
   const filteredLocations = locations.filter((location) =>
     location?.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -28,7 +28,7 @@ const Locations = () => {
 
   const getAllLocations = async () => {
     setIsLoading(true);
-    const {data}  = await getLocations();
+    const { data } = await getLocations();
     setLocations(data);
     setIsLoading(false);
   };
@@ -52,23 +52,19 @@ const Locations = () => {
   }, []);
 
   return (
-    <Box
-      height="100vh" width="100vw" display="flex" p={1}
-      flexDirection="column" alignItems="center" justifyContent="flex-start"
-      sx={{ background: "linear-gradient(135deg, #000, #6D6D6D)" }}>
-      <Stack direction="row" justifyContent="space-between" alignItems="center" width="100%" maxWidth="900px" mb={1}>
-        <Input
-          disableUnderline
+    <Box height="100%" width="100%" display="flex" p={1}
+      flexDirection="column" alignItems="center" justifyContent="flex-start" bgcolor='transparent'>
+      <Stack direction="row" justifyContent="flex-end" alignItems="center" width="100%" mb={1}>
+        <Input disableUnderline
           placeholder="Search location..."
           onChange={(e) => setSearchTerm(e.target.value)}
-          sx={{
-            width: '100%', padding: '10px', borderRadius: '8px',
-            backgroundColor: '#ffffff', boxShadow: '0 0 10px rgba(255, 0, 0, 0.4)',
-            fontWeight: 'bold', mr: 2,
-          }}
-        />
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          sx={{ width: isFocused ? '24rem' : '10rem', transition: 'width 0.3s ease-in-out',
+            padding: '10px', borderRadius: '8px', backgroundColor: '#ffffff',
+            boxShadow: '0 0 10px rgba(255, 0, 0, 0.4)', fontWeight: 'bold', mr: 2 }}/>
         <Button
-          sx={{ bgcolor: 'green', color: '#FFFFFF', fontWeight: 'bold', height: '40px', width: '12rem' }}
+          sx={{ bgcolor: 'green', color: '#FFFFFF', fontWeight: 'bold', height: '52px', width: '12rem' }}
           onClick={() => setCreateModal(!createModal)}>
           Create
         </Button>
@@ -79,10 +75,22 @@ const Locations = () => {
           <Loading />
         </Box>
       ) : (
-        <TableContainer component={Paper} sx={{ width: '100%', height: '100%', maxWidth: '100vw', borderRadius: '8px', overflowX: 'auto', boxShadow: '0px 4px 12px rgba(0,0,0,0.1)' }}>
-          <Table sx={{ minWidth: '400px' }}>
-            <TableHead>
-              <TableRow sx={{ background: '#D32F2F' }}>
+        <TableContainer component={Paper} 
+        sx={{
+          width: '100%',
+          height: '100%',
+          maxHeight:'80vh',
+          borderRadius: '8px',
+          overflowY: 'auto',
+          boxSizing: 'border-box',
+          border: '1px solid #ddd',
+          boxShadow: '0px 4px 12px rgba(0,0,0,0.1)',
+          '&::-webkit-scrollbar': { width: '6px' },
+          '&::-webkit-scrollbar-thumb': { backgroundColor: '#888', borderRadius: '10px' },
+          '&::-webkit-scrollbar-thumb:hover': { backgroundColor: '#555' }}}>
+          <Table>
+            <TableHead sx={{position:'sticky', top : '0', zIndex:'2'}}>
+              <TableRow sx={{ background: 'rgba(71, 17, 24, 0.98)' }}>
                 <TableCell sx={{ color: '#fff', fontWeight: 'bold' }}>№</TableCell>
                 <TableCell align="center" sx={{ color: '#fff', fontWeight: 'bold' }}>Rasm</TableCell>
                 <TableCell align="center" sx={{ color: '#fff', fontWeight: 'bold' }}>Name</TableCell>
@@ -91,34 +99,30 @@ const Locations = () => {
                 <TableCell align="center" sx={{ color: '#fff', fontWeight: 'bold' }}>Amallar</TableCell>
               </TableRow>
             </TableHead>
+            <TableBody>
+              {filteredLocations?.map((location, idx) => (
+                <TableRow key={location.id}>
+                  <TableCell>{idx + 1}</TableCell>
+                  <TableCell align="center">
+                    <Box component="img" src={`https://realauto.limsa.uz/api/uploads/images/${location?.image_src}`} sx={{ width: 80, height: 80, objectFit: 'cover', borderRadius: '6px', border: '1px solid #cccccc' }} />
+                  </TableCell>
+                  <TableCell align="center">{location.name}</TableCell>
+                  <TableCell align="center">{location.slug}</TableCell>
+                  <TableCell align="center">{location.text}</TableCell>
+                  <TableCell align="center">
+                    <Stack direction="row" spacing={1} justifyContent="center">
+                      <Button onClick={() => handleEdit(location)}>
+                        <Edit sx={{ color: 'blue' }} />
+                      </Button>
+                      <Button onClick={() => deleteCard(location.id)}>
+                        <Delete sx={{ color: 'red' }} />
+                      </Button>
+                    </Stack>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
           </Table>
-          <Box sx={{ maxHeight: '70vh', overflowY: 'auto', '&::-webkit-scrollbar': { width: '6px' }, '&::-webkit-scrollbar-thumb': { backgroundColor: '#888', borderRadius: '10px' }, '&::-webkit-scrollbar-thumb:hover': { backgroundColor: '#555' } }}>
-            <Table>
-              <TableBody>
-                {filteredLocations?.map((location, idx) => (
-                  <TableRow key={location.id}>
-                    <TableCell>{idx + 1}</TableCell>
-                    <TableCell align="center">
-                      <Box component="img" src={`https://realauto.limsa.uz/api/uploads/images/${location?.image_src}`} sx={{ width: 80, height: 80, objectFit: 'cover', borderRadius: '6px', border: '1px solid #cccccc' }} />
-                    </TableCell>
-                    <TableCell align="center">{location.name}</TableCell>
-                    <TableCell align="center">{location.slug}</TableCell>
-                    <TableCell align="center">{location.text}</TableCell>
-                    <TableCell align="center">
-                      <Stack direction="row" spacing={1} justifyContent="center">
-                        <Button onClick={() => handleEdit(location)}>
-                          <Edit sx={{ color: 'blue' }} />
-                        </Button>
-                        <Button onClick={() => deleteCard(location.id)}>
-                          <Delete sx={{ color: 'red' }} />
-                        </Button>
-                      </Stack>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </Box>
         </TableContainer>
       )}
       {createModal && <CreateLocation getAllLocations={getAllLocations} handleClose={setCreateModal} open={createModal} />}
